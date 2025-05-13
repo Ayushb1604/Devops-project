@@ -1,0 +1,36 @@
+---
+- name: Deploy Frontend
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Ensure Docker is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Build Docker image
+      community.docker.docker_image:
+        name: my-frontend
+        source: build
+        build:
+          path: ../frontend  # Path to the directory containing Dockerfile
+          dockerfile: Dockerfile
+        state: present
+      register: build_result
+
+    - name: Remove existing container if running
+      community.docker.docker_container:
+        name: my-frontend-container
+        state: absent
+        force_kill: yes
+      ignore_errors: yes
+
+    - name: Run Docker container
+      community.docker.docker_container:
+        name: my-frontend-container
+        image: my-frontend
+        state: started
+        restart_policy: unless-stopped
+        ports:
+          - "8080:80"
