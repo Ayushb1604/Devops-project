@@ -1,13 +1,7 @@
 pipeline {
     agent any
     stages {
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/Ayushb1604/Devops-project.git',
-                    credentialsId: 'Devops_project'  // <--- This is the correct place!
-            }
-        }
-        stage('Build') {
+        stage('Build docker image') {
             steps {
                 sh 'docker build -t my-frontend ./frontend'
             }
